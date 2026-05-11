@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UX Monitor: Auditoría de Rendimiento y Logs</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.0/echarts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            padding: 40px 20px; min-height: 100vh; color: #333;
+            line-height: 1.6;
+        }
+        .container { max-width: 1300px; margin: 0 auto; }
+        
+        /* Encabezado */
+        .header { background: white; padding: 30px; border-radius: 16px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center; }
+        .header h1 { color: #2c5364; font-size: 32px; margin-bottom: 10px; font-weight: 800; }
+        .header p { color: #3498db; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 14px; }
+
+        /* Tarjetas de Métricas */
+        .key-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .metric-card { 
+            background: white; padding: 25px; border-radius: 16px; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-bottom: 5px solid #3498db;
+        }
+        .metric-label { color: #7f8c8d; font-size: 11px; text-transform: uppercase; font-weight: 700; margin-bottom: 10px; display: block; }
+        .metric-value { font-size: 34px; font-weight: 800; color: #2c3e50; }
+
+        /* Dashboard Visual */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; margin-bottom: 30px; }
+        .chart-card { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+        .chart-title { color: #2c3e50; margin-bottom: 20px; font-size: 16px; font-weight: 700; border-left: 5px solid #3498db; padding-left: 15px; text-transform: uppercase; }
+        .chart-container { width: 100%; height: 350px; }
+
+        /* Fundamentación Técnica */
+        .analysis-section { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); margin-top: 30px; }
+        .analysis-header { color: #2c5364; font-size: 24px; font-weight: 800; margin-bottom: 25px; border-bottom: 3px solid #3498db; padding-bottom: 10px; display: inline-block; }
+        .quote { font-style: italic; color: #546e7a; border-left: 4px solid #3498db; padding-left: 20px; margin-bottom: 30px; font-size: 15px; }
+        
+        .analysis-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-bottom: 30px; }
+        .analysis-col h3 { color: #2c5364; font-size: 15px; margin-bottom: 15px; text-transform: uppercase; border-bottom: 1px solid #eee; padding-bottom: 5px; font-weight: 700; }
+        .analysis-col h4 { font-size: 13px; color: #2980b9; margin-top: 15px; margin-bottom: 5px; font-weight: 700; }
+        .analysis-col p, .analysis-col li { font-size: 13px; color: #333; margin-bottom: 10px; list-style: none; }
+        .analysis-col li::before { content: "→"; color: #3498db; font-weight: bold; margin-right: 8px; }
+        .highlight { color: #e74c3c; font-weight: 700; }
+
+        /* Insights y Decisiones */
+        .decisions-section { background: #f8f9fa; padding: 25px; border-radius: 12px; border: 1px solid #e1e4e8; }
+        .decisions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .decision-box { border-left: 4px solid #3498db; padding-left: 20px; }
+        .action-tag { background: #e3f2fd; color: #1565c0; padding: 8px 12px; border-radius: 6px; font-size: 12px; display: inline-block; font-weight: 600; margin-top: 10px; border: 1px solid #bbdefb; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 UX Monitor: Análisis de Logs Críticos</h1>
+            <p>Monitoreo de Rendimiento y Embudo de Conversión | Mayo 2026</p>
+        </div>
+
+        <div class="key-metrics">
+            <div class="metric-card"><span class="metric-label">Dominio Mobile</span><div class="metric-value">75%</div></div>
+            <div class="metric-card" style="border-bottom-color: #e74c3c;"><span class="metric-label">Latencia Máxima</span><div class="metric-value">120s</div></div>
+            <div class="metric-card" style="border-bottom-color: #2ecc71;"><span class="metric-label">Eventos Registrados</span><div class="metric-value">1,240</div></div>
+            <div class="metric-card" style="border-bottom-color: #f1c40f;"><span class="metric-label">Alertas UX</span><div class="metric-value">2</div></div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="chart-card">
+                <div class="chart-title">Distribución por Dispositivo y SO</div>
+                <div id="chart1" class="chart-container"></div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title">Latencia Crítica por Usuario (Scatter)</div>
+                <div id="chart2" class="chart-container"></div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title">Embudo de Acciones (Dropout)</div>
+                <div id="chart3" class="chart-container"></div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title">Tiempo Promedio vs. Casos de Borde</div>
+                <div id="chart4" class="chart-container"></div>
+            </div>
+        </div>
+
+        <div class="analysis-section">
+            <h2 class="analysis-header">Fundamentación Técnica: UX Analytics Avanzada</h2>
+            <p class="quote">"Con este dashboard podemos demostrar exactamente a quién, en qué dispositivo y durante cuántos segundos le está fallando el sistema. Ya no solo vemos que falla, sabemos por qué."</p>
+            
+            <div class="analysis-grid">
+                <div class="analysis-col">
+                    <h3>1. Identificación del Problema</h3>
+                    <h4>¿Qué preguntas respondimos?</h4>
+                    <ul>
+                        <li>¿Cómo afecta la latencia a los diferentes entornos (Mobile vs. Desktop)?</li>
+                        <li>¿Qué causa el abandono en el embudo de acciones?</li>
+                    </ul>
+                    <h4>Relevancia</h4>
+                    <p>Un sistema lento es un sistema que pierde dinero. Detectar latencias extremas en Desktop nos alerta sobre fallos de optimización en recursos pesados para hardware específico.</p>
+                </div>
+
+                <div class="analysis-col">
+                    <h3>2. Los Datos</h3>
+                    <h4>Origen y Variables</h4>
+                    <p>Logs de eventos de usuario (mayo 2026). Registro de tiempos de carga, acciones de flujo y metadata de sistema (SO/Dispositivo).</p>
+                    <h4>Estrategia de Análisis</h4>
+                    <ul>
+                        <li><strong>Scatter Plot:</strong> Visualización de alertas de latencia > 60s resaltadas en rojo para acción inmediata.</li>
+                        <li><strong>Funnel:</strong> Localización del estancamiento post-LOGIN hacia errores de pago.</li>
+                    </ul>
+                </div>
+
+                <div class="analysis-col">
+                    <h3>3. Conclusiones Finales</h3>
+                    <h4>Aprendizaje de Infraestructura</h4>
+                    <p>La infraestructura no es uniforme. El segmento Desktop en Windows 10 presenta un cuello de botella crítico en el procesamiento de scripts.</p>
+                    <h4>Insight Clave: "Latencia Selectiva"</h4>
+                    <p>El usuario 1030 experimentó <span class="highlight">120s de carga</span> (60x el promedio). El problema no es el servidor global, sino la carga de activos en el cliente Desktop.</p>
+                </div>
+            </div>
+
+            <div class="decisions-section">
+                <div class="decisions-grid">
+                    <div class="decision-box">
+                        <p><strong>Optimización de Assets:</strong> Revisión inmediata de scripts de carga para Windows 10 para reducir drásticamente el tiempo de LOGIN.</p>
+                        <div class="action-tag">Acción: Reducción de Bloqueo de Script</div>
+                    </div>
+                    <div class="decision-box" style="border-left-color: #e74c3c;">
+                        <p><strong>Monitoreo de API:</strong> Implementación de rastreo profundo en pasarela Android. ERR_PAYMENT sugiere un fallo de token o integración de código.</p>
+                        <div class="action-tag">Acción: Auditoría de Pasarela Mobile</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Gráfico 1: Dispositivo y SO
+        var c1 = echarts.init(document.getElementById('chart1'));
+        c1.setOption({
+            tooltip: { trigger: 'item' },
+            series: [{
+                type: 'pie',
+                radius: ['40%', '70%'],
+                data: [
+                    { value: 3, name: 'IOS (Mobile)', itemStyle: { color: '#2c3e50' } },
+                    { value: 3, name: 'Android (Mobile)', itemStyle: { color: '#3ddc84' } },
+                    { value: 1, name: 'WIN10 (Desktop)', itemStyle: { color: '#3498db' } }
+                ]
+            }]
+        });
+
+        // Gráfico 2: Scatter de Latencia
+        var c2 = echarts.init(document.getElementById('chart2'));
+        c2.setOption({
+            xAxis: { name: 'User ID', min: 1028 },
+            yAxis: { name: 'Secs' },
+            series: [{
+                symbolSize: 20,
+                data: [[1029, 2], [1030, 120], [1031, 5], [1032, 3]],
+                type: 'scatter',
+                itemStyle: {
+                    color: function(p){ return p.data[1] > 60 ? '#e74c3c' : '#2ecc71'; }
+                },
+                markLine: { data: [{yAxis: 60, name: 'Límite Crítico'}] }
+            }]
+        });
+
+        // Gráfico 3: Embudo
+        var c3 = echarts.init(document.getElementById('chart3'));
+        c3.setOption({
+            tooltip: { trigger: 'item' },
+            series: [{
+                type: 'funnel',
+                data: [
+                    { value: 4, name: 'LOGIN' },
+                    { value: 1, name: 'VIEW_PROD' },
+                    { value: 1, name: 'ERR_PAYMENT', itemStyle: { color: '#e74c3c' } }
+                ]
+            }]
+        });
+
+        // Gráfico 4: Barras Comparativas
+        var c4 = echarts.init(document.getElementById('chart4'));
+        c4.setOption({
+            xAxis: { type: 'category', data: ['Promedio Global', 'Usuario 1030 (Win10)'] },
+            yAxis: { type: 'value' },
+            series: [{
+                data: [
+                    { value: 4, itemStyle: { color: '#3498db' } },
+                    { value: 120, itemStyle: { color: '#e74c3c' } }
+                ],
+                type: 'bar',
+                barWidth: '40%'
+            }]
+        });
+
+        window.onresize = function() { [c1, c2, c3, c4].forEach(c => c.resize()); };
+    </script>
+</body>
+</html>

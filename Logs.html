@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auditoría de Logs: Fundamentación Estratégica</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.0/echarts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 40px 20px; min-height: 100vh; color: #333;
+            line-height: 1.6;
+        }
+        .container { max-width: 1300px; margin: 0 auto; }
+        
+        .header { background: white; padding: 30px; border-radius: 16px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center; }
+        .header h1 { color: #1e3c72; font-size: 32px; margin-bottom: 10px; font-weight: 800; }
+        .header p { color: #666; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+
+        .key-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .metric-card { 
+            background: white; padding: 25px; border-radius: 16px; text-align: center;
+            transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .metric-card:hover { transform: translateY(-5px); }
+        .metric-label { color: #7f8c8d; font-size: 11px; text-transform: uppercase; font-weight: 700; margin-bottom: 10px; display: block; }
+        .metric-value { font-size: 34px; font-weight: 800; color: #2c3e50; }
+
+        .table-card { background: white; padding: 30px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); margin-bottom: 30px; overflow-x: auto; }
+        .table-title { color: #2c3e50; margin-bottom: 20px; font-size: 18px; font-weight: 700; border-left: 5px solid #2a5298; padding-left: 15px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background: #f8f9fa; color: #1e3c72; text-align: left; padding: 15px; font-size: 12px; text-transform: uppercase; border-bottom: 2px solid #dee2e6; }
+        td { padding: 15px; border-bottom: 1px solid #eee; font-size: 14px; }
+        tr:hover { background-color: #f1f7ff; }
+
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .status-success { background: #e8f5e9; color: #2e7d32; }
+        .status-warning { background: #fff3e0; color: #ef6c00; border: 1px solid #ffe0b2; }
+        .status-danger { background: #ffebee; color: #c62828; animation: pulse 2s infinite; }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+
+        /* Nueva Sección de Auditoría Estratégica */
+        .strategic-section { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.4); margin-top: 30px; }
+        .strategic-header { color: #1e3c72; font-size: 24px; font-weight: 800; margin-bottom: 25px; border-bottom: 3px solid #1e3c72; padding-bottom: 10px; display: inline-block; }
+        .quote { font-style: italic; color: #546e7a; border-left: 4px solid #1e3c72; padding-left: 20px; margin-bottom: 30px; font-size: 15px; }
+        
+        .analysis-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-bottom: 30px; }
+        .analysis-col h3 { color: #1e3c72; font-size: 16px; margin-bottom: 15px; text-transform: uppercase; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .analysis-col h4 { font-size: 14px; color: #2a5298; margin-top: 15px; margin-bottom: 5px; font-weight: 700; }
+        .analysis-col p, .analysis-col li { font-size: 13px; color: #333; margin-bottom: 10px; list-style: none; }
+        .analysis-col li::before { content: "→"; color: #1e3c72; font-weight: bold; margin-right: 8px; }
+        .highlight-danger { color: #c62828; font-weight: 700; }
+
+        .insights-section { background: #f8f9fa; padding: 25px; border-radius: 12px; border: 1px solid #e1e4e8; }
+        .insights-title { font-size: 18px; color: #2c3e50; font-weight: 700; margin-bottom: 20px; }
+        .insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .insight-box { border-left: 4px solid #1e3c72; padding-left: 20px; }
+        .insight-text { font-size: 13.5px; color: #333; margin-bottom: 12px; }
+        .action-tag { background: #e8f5e9; color: #2e7d32; padding: 8px 12px; border-radius: 6px; font-size: 12px; display: inline-block; font-weight: 600; border: 1px solid #c8e6c9; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Auditoría de Logs de Usuario</h1>
+            <p>Análisis de Sesión y Detección de Anomalías</p>
+        </div>
+
+        <div class="key-metrics">
+            <div class="metric-card"><span class="metric-label">Total Eventos</span><div class="metric-value">7</div></div>
+            <div class="metric-card" style="border-bottom: 5px solid #2e7d32;"><span class="metric-label">Usuarios Activos</span><div class="metric-value">4</div></div>
+            <div class="metric-card" style="border-bottom: 5px solid #ef6c00;"><span class="metric-label">Alertas de Carga</span><div class="metric-value">1</div></div>
+            <div class="metric-card" style="border-bottom: 5px solid #c62828;"><span class="metric-label">Errores Críticos</span><div class="metric-value">1</div></div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-title">Detalle de Actividad en Tiempo Real</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Log ID</th>
+                        <th>User ID</th>
+                        <th>Acción</th>
+                        <th>Duración (seg)</th>
+                        <th>Dispositivo</th>
+                        <th>SO</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>L1</td><td>1029</td><td>LOGIN</td><td>2</td><td>MOBILE</td><td>IOS</td><td><span class="badge status-success">NORMAL</span></td></tr>
+                    <tr><td>L2</td><td>1029</td><td>VIEW_PROD</td><td>45</td><td>MOBILE</td><td>IOS</td><td><span class="badge status-success">NORMAL</span></td></tr>
+                    <tr><td>L3</td><td>1029</td><td>LOGOUT</td><td>1</td><td>MOBILE</td><td>IOS</td><td><span class="badge status-success">NORMAL</span></td></tr>
+                    <tr class="status-warning"><td>L4</td><td>1030</td><td>LOGIN</td><td>120</td><td>DESKTOP</td><td>WIN10</td><td><span class="badge status-warning">SOSPECHOSO</span></td></tr>
+                    <tr><td>L5</td><td>1031</td><td>LOGIN</td><td>5</td><td>MOBILE</td><td>ANDROID</td><td><span class="badge status-success">NORMAL</span></td></tr>
+                    <tr class="status-danger"><td>L6</td><td>1031</td><td>ERR_PAYMENT</td><td>0</td><td>MOBILE</td><td>ANDROID</td><td><span class="badge status-danger">CRÍTICO</span></td></tr>
+                    <tr><td>L7</td><td>1032</td><td>LOGIN</td><td>3</td><td>MOBILE</td><td>ANDROID</td><td><span class="badge status-success">NORMAL</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="strategic-section">
+            <h2 class="strategic-header">Fundamentación de Auditoría de Logs</h2>
+            <p class="quote">"Este Dashboard se enfoca en el 'cómo' y el 'por qué'... Identificar que un pago falla en 0 segundos es la única forma de dar una respuesta técnica al CFO y al CTO."</p>
+            
+            <div class="analysis-grid">
+                <div class="analysis-col">
+                    <h3>1. Identificación del problema</h3>
+                    <h4>¿Qué preguntas intentamos responder?</h4>
+                    <ul>
+                        <li>¿Dónde se rompe el embudo de conversión?</li>
+                        <li>¿Es la latencia un factor crítico de abandono?</li>
+                    </ul>
+                    <h4>¿Por qué es relevante?</h4>
+                    <p>Un ingreso nulo es solo el síntoma; los logs son las "tripas" del sistema. Necesitábamos correlacionar los fallos técnicos con la pérdida financiera real.</p>
+                </div>
+
+                <div class="analysis-col">
+                    <h3>2. Los Datos</h3>
+                    <h4>¿De dónde salen?</h4>
+                    <p>Logs de actividad del servidor en formato crudo, capturando el ciclo completo desde el LOGIN hasta el LOGOUT.</p>
+                    <h4>¿Cómo los usamos?</h4>
+                    <ul>
+                        <li><strong>Profiling:</strong> Identificación de víctimas del bug (Usuario 1031).</li>
+                        <li><strong>Benchmarking:</strong> Contraste del Estándar de Oro (&lt;3s) vs. degradación en Windows (120s).</li>
+                        <li><strong>Categorización:</strong> Clasificación Normal/Sospechoso/Crítico.</li>
+                    </ul>
+                </div>
+
+                <div class="analysis-col">
+                    <h3>3. Conclusiones Finales</h3>
+                    <h4>¿Qué aprendimos?</h4>
+                    <p>La latencia es silenciosa pero mortal. El usuario 1030 es una pérdida de retención, no solo un retraso de carga.</p>
+                    <h4>Insight: La "Pistola Humeante"</h4>
+                    <p>El error de pago en <span class="highlight-danger">0 segundos (L6)</span> prueba que el fallo es nuestro handshake de API, no el banco del usuario.</p>
+                    <h4>Decisión Tomada</h4>
+                    <ul>
+                        <li>Hotfix inmediato para bundles de JS en Windows.</li>
+                        <li>Auditoría de cifrado de pasarela para Android.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="insights-section">
+                <div class="insights-title">💡 Acciones Derivadas de la Auditoría</div>
+                <div class="insights-grid">
+                    <div class="insight-box">
+                        <p class="insight-text"><strong>Cultura de Datos:</strong> Pasamos de mirar "totales" a Percentiles y Casos de Borde. Cada alerta sospechosa activa ahora un protocolo de revisión preventiva.</p>
+                        <div class="action-tag">Acción: Monitoreo de Percentiles (P99)</div>
+                    </div>
+                    <div class="insight-box" style="border-left-color: #c62828;">
+                        <p class="insight-text"><strong>Evidencia de Crisis:</strong> Este análisis le dice al equipo exactamente en qué trinchera se quedaron atrapados nuestros soldados (usuarios).</p>
+                        <div class="action-tag">Acción: Reparación de Handshake API</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
